@@ -7,6 +7,10 @@
     orchestrate = import ./components/orchestrate.nix { inherit inputs; };
   };
 
+  # The shared frame of a pure scenario: `flake.lib.scenario { pkgs, name }
+  # drive` is a check that runs `drive` in a fresh root.
+  scenario = import ./scenario.nix;
+
   # The cheapest model per harness, the semi-sandbox default.
   cheapestModel = {
     claude = "haiku";

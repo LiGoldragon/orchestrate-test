@@ -7,7 +7,7 @@
     blueprint.url = "github:numtide/blueprint";
     blueprint.inputs.nixpkgs.follows = "nixpkgs";
 
-    orchestrate.url = "github:LiGoldragon/orchestrate/d80a617f7e03ebade846c41ac540b7d173d3d056";
+    orchestrate.url = "github:LiGoldragon/orchestrate/bc5cd36e81df395ed1f84e2e3e98d5a6ee90bf8c";
     orchestrate.inputs.nixpkgs.follows = "nixpkgs";
   };
 

@@ -15,36 +15,12 @@
 let
   orchestrate = flake.lib.components.orchestrate.forSystem system;
 in
-pkgs.runCommand "orchestrate"
+flake.lib.scenario
   {
-    nativeBuildInputs = [ pkgs.coreutils ];
+    inherit pkgs;
+    name = "orchestrate";
   }
   ''
-    root="$(mktemp -d)"
-    export HOME="$root/home"
-    export XDG_RUNTIME_DIR="$root/runtime"
-    export XDG_STATE_HOME="$root/state"
-    mkdir -p "$HOME"
-
-    # expect <label> <exit code> <reply> <client> <argument>: the client's
-    # whole stdout must equal <reply> and its exit code <exit code>.
-    expect() {
-      label="$1" wantCode="$2" want="$3"
-      shift 3
-      set +e
-      got="$(timeout 10 "$@")"
-      code=$?
-      set -e
-      echo "$label: $got (exit $code)"
-      if [ "$got" != "$want" ] || [ "$code" != "$wantCode" ]; then
-        echo "$label: expected $want (exit $wantCode)" >&2
-        exit 1
-      fi
-    }
-
-    # A failing assertion must not leave the Nexus holding the build log
-    # open; Nix would wait on it instead of failing.
-    trap 'kill "''${orchestrateNexusPid:-}" 2>/dev/null || true' EXIT
     ${orchestrate.start}
     test -e "$XDG_STATE_HOME/${orchestrate.store}"
 
@@ -63,7 +39,4 @@ pkgs.runCommand "orchestrate"
       ${orchestrate.metaClient} "Configure.{ «$ORCHESTRATE_SOCKET» «$ORCHESTRATE_META_SOCKET» }"
 
     ${orchestrate.stop}
-    echo "orchestrate: torn down"
-    rm -rf "$root"
-    touch $out
   ''

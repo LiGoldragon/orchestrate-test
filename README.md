@@ -17,9 +17,12 @@ Laid out for [numtide blueprint](https://numtide.github.io/blueprint): the
 directory tree is the flake's output tree.
 
     flake.nix                          inputs and `inputs.blueprint { inherit inputs; }`
-    lib/default.nix                    flake.lib: components, cheapestModel
+    lib/default.nix                    flake.lib: components, scenario, cheapestModel
+    lib/scenario.nix                   the frame of a pure scenario: root, expect, exit trap
     lib/components/orchestrate.nix     the Nexus and both clients: paths, start, stop
     checks/orchestrate.nix             pure scenario (a check)
+    checks/orchestrate-populated-store.nix   pure: restart on a populated store
+    checks/orchestrate-old-meta-name.nix     pure: a store saving a non-default meta socket name
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -29,6 +32,8 @@ directory tree is the flake's output tree.
 | scenario | kind | components |
 | --- | --- | --- |
 | `orchestrate` | pure check | Orchestrate (Nexus, `orchestrate`, `orchestrate-meta`) |
+| `orchestrate-populated-store` | pure check | Orchestrate |
+| `orchestrate-old-meta-name` | pure check | Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)
@@ -48,6 +53,29 @@ clients and compares each whole reply and exit code:
 
 and then stops the Nexus and requires it to exit on TERM. No network, no
 credentials, no model.
+
+`start` waits on the Nexus's own `orchestrate-nexus ready` line, which it
+prints only once both sockets are bound, not on a socket file existing: after
+a restart the previous run's files are still there.
+
+### `orchestrate-populated-store` (pure)
+
+A fresh store takes one Lock (`Locked.{ 1 … }`); the Nexus is stopped with
+TERM and started again on the same directories. Then `Observe.Locks` →
+`Observed.Locks.[ { 1 … } ]`, a second Lock is numbered 2, and the meta
+`Configure` with the same paths answers `Configured.{ { … } True }`, so both
+sockets are bound again.
+
+### `orchestrate-old-meta-name` (pure)
+
+The live system's situation: a store whose saved meta socket name is the
+legacy `meta-orchestrate.sock`. A fresh store is configured over the meta
+client to that name and restarted. The meta client then reaches it at the
+legacy name, and at the default name fails on stderr with
+`Unreachable.{ <default> «Unix socket I/O failed: Connection refused (os error 111)» }`
+(exit 1) while the ordinary client is unaffected. A meta `Configure` back to
+`orchestrate-meta.sock` and a restart restore the default, and the legacy name
+is then refused the same way.
 
 ### `orchestrate-claude` (semi-sandbox, gated)
 

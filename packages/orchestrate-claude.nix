@@ -119,6 +119,9 @@ pkgs.writeShellApplication {
       DISABLE_INSTALLATION_CHECKS=1
     )
 
+    # The living's own shell may point these at the live Nexus; start
+    # must take this root's defaults.
+    unset ORCHESTRATE_SOCKET ORCHESTRATE_META_SOCKET
     export XDG_RUNTIME_DIR="$root/runtime" XDG_STATE_HOME="$root/state"
     ${orchestrate.start}
     nexusStarted=1

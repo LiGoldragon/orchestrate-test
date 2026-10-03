@@ -16,33 +16,37 @@
     metaClient = "${package}/bin/orchestrate-meta";
 
     # Relative to XDG_RUNTIME_DIR and XDG_STATE_HOME, as orchestrate-nexus
-    # derives them.
+    # derives them for a fresh store.
     ordinarySocket = "orchestrate-nexus/orchestrate.sock";
     metaSocket = "orchestrate-nexus/orchestrate-meta.sock";
     store = "orchestrate-nexus/orchestrate-nexus.sema";
 
     # Starts the Nexus against the caller's exported XDG_RUNTIME_DIR and
-    # XDG_STATE_HOME, records its pid in `orchestrateNexusPid`, exports both
-    # client socket variables, and waits (bounded) until both sockets are
-    # bound. The caller must start from a fresh state root: a populated store
-    # resumes the socket paths it persisted.
+    # XDG_STATE_HOME and records its pid in `orchestrateNexusPid`. It waits
+    # (bounded) on the Nexus's own `orchestrate-nexus ready` line, printed
+    # only once both sockets its store names are bound, never on a socket
+    # file existing: on a restart the previous run's files are still there.
+    # It exports the default client socket paths unless the caller already
+    # set them; a scenario whose store names other paths sets them itself.
     start = ''
       mkdir -p "$XDG_RUNTIME_DIR" "$XDG_STATE_HOME"
       chmod 700 "$XDG_RUNTIME_DIR"
-      ${nexus} &
+      orchestrateNexusOutput="$XDG_RUNTIME_DIR/orchestrate-nexus.stdout"
+      : > "$orchestrateNexusOutput"
+      ${nexus} > "$orchestrateNexusOutput" &
       orchestrateNexusPid=$!
-      export ORCHESTRATE_SOCKET="$XDG_RUNTIME_DIR/${ordinarySocket}"
-      export ORCHESTRATE_META_SOCKET="$XDG_RUNTIME_DIR/${metaSocket}"
+      export ORCHESTRATE_SOCKET="''${ORCHESTRATE_SOCKET:-$XDG_RUNTIME_DIR/${ordinarySocket}}"
+      export ORCHESTRATE_META_SOCKET="''${ORCHESTRATE_META_SOCKET:-$XDG_RUNTIME_DIR/${metaSocket}}"
       for _ in $(seq 1 200); do
-        test -S "$ORCHESTRATE_SOCKET" && test -S "$ORCHESTRATE_META_SOCKET" && break
+        grep -qx 'orchestrate-nexus ready' "$orchestrateNexusOutput" && break
         kill -0 "$orchestrateNexusPid" || { echo "orchestrate-nexus exited before binding" >&2; exit 1; }
         sleep 0.1
       done
-      test -S "$ORCHESTRATE_SOCKET"
-      test -S "$ORCHESTRATE_META_SOCKET"
+      grep -qx 'orchestrate-nexus ready' "$orchestrateNexusOutput"
+      echo "orchestrate-nexus ready (pid $orchestrateNexusPid)"
     '';
 
-    # Stops the Nexus and waits (bounded) for it to exit.
+    # Stops the Nexus with TERM and waits (bounded) for it to exit.
     stop = ''
       kill "$orchestrateNexusPid" 2>/dev/null || true
       for _ in $(seq 1 100); do

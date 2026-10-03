@@ -1,7 +1,7 @@
 # Orchestrate: the Orchestrate Nexus and its `orchestrate` / `orchestrate-meta`
 # clients, taken from a pinned orchestrate input: `orchestrate` for the
-# generation under test, `orchestrate-previous` for the release before it. The
-# Nexus takes no
+# generation under test, `orchestrate-previous` for the release before it,
+# `orchestrate-live` for the release the live Nexus runs. The Nexus takes no
 # arguments; it reads XDG_RUNTIME_DIR for its sockets and XDG_STATE_HOME for
 # its store, so a scenario points both at its own root and gets a fresh store
 # and its own sockets. The direct clients read ORCHESTRATE_SOCKET and
@@ -46,6 +46,42 @@
       done
       grep -qx 'orchestrate-nexus ready' "$orchestrateNexusOutput"
       echo "orchestrate-nexus ready (pid $orchestrateNexusPid)"
+    '';
+
+    # Starts the Nexus like `start`, but an exit is an outcome rather than a
+    # failure: it waits (bounded) until the Nexus prints its ready line or
+    # exits, and sets `orchestrateNexusOutcome` to `ready` or `exited <code>`,
+    # with the Nexus's stderr in `$orchestrateNexusError`. A scenario that
+    # must state what a Nexus answers a store with, refusal included, uses
+    # this and asserts the outcome itself.
+    attempt = ''
+      mkdir -p "$XDG_RUNTIME_DIR" "$XDG_STATE_HOME"
+      chmod 700 "$XDG_RUNTIME_DIR"
+      orchestrateNexusOutput="$XDG_RUNTIME_DIR/orchestrate-nexus.stdout"
+      orchestrateNexusError="$XDG_RUNTIME_DIR/orchestrate-nexus.stderr"
+      : > "$orchestrateNexusOutput"
+      : > "$orchestrateNexusError"
+      ${nexus} > "$orchestrateNexusOutput" 2> "$orchestrateNexusError" &
+      orchestrateNexusPid=$!
+      export ORCHESTRATE_SOCKET="''${ORCHESTRATE_SOCKET:-$XDG_RUNTIME_DIR/${ordinarySocket}}"
+      export ORCHESTRATE_META_SOCKET="''${ORCHESTRATE_META_SOCKET:-$XDG_RUNTIME_DIR/${metaSocket}}"
+      orchestrateNexusOutcome=""
+      for _ in $(seq 1 200); do
+        if grep -qx 'orchestrate-nexus ready' "$orchestrateNexusOutput"; then
+          orchestrateNexusOutcome=ready
+          break
+        fi
+        if ! kill -0 "$orchestrateNexusPid" 2>/dev/null; then
+          set +e
+          wait "$orchestrateNexusPid"
+          orchestrateNexusOutcome="exited $?"
+          set -e
+          break
+        fi
+        sleep 0.1
+      done
+      echo "orchestrate-nexus outcome: ''${orchestrateNexusOutcome:-neither ready nor exited in 20 s}"
+      echo "orchestrate-nexus stderr: «$(cat "$orchestrateNexusError")»"
     '';
 
     # Stops the Nexus with TERM and waits (bounded) for it to exit.

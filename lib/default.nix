@@ -12,6 +12,10 @@
       name = "orchestrate-previous";
       input = inputs.orchestrate-previous;
     };
+    orchestrate-live = import ./components/orchestrate.nix {
+      name = "orchestrate-live";
+      input = inputs.orchestrate-live;
+    };
   };
 
   # The shared frame of a pure scenario: `flake.lib.scenario { pkgs, name }

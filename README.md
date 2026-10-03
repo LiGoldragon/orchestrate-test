@@ -11,6 +11,11 @@ A second input, `orchestrate-previous`, pins the release before the one under
 test (0.36.1, `bc5cd36e`) for the scenario that resumes its store; move it to
 the outgoing release whenever `orchestrate` moves past a store or wire change.
 
+A third input, `orchestrate-live`, pins the release the live Nexus runs
+(0.35.0, `9070cbb8`; built against this flake's `nixpkgs` its package is the
+very store path the live `orchestrate-nexus` service executes) for the rollback
+scenarios; move it when the live Nexus is redeployed.
+
 Test unpushed Orchestrate code with
 `--override-input orchestrate path:/git/github.com/LiGoldragon/orchestrate`.
 Once it lands, `nix flake update orchestrate` and commit the lock.
@@ -28,6 +33,8 @@ directory tree is the flake's output tree.
     checks/orchestrate-populated-store.nix   pure: restart on a populated store
     checks/orchestrate-old-meta-name.nix     pure: a store saving a non-default meta socket name
     checks/orchestrate-previous-orchestrate.nix   pure: the previous release's store resumes
+    checks/orchestrate-rollback.nix               pure: the live release resumes the store under test
+    checks/orchestrate-live-orchestrate.nix       pure: the live release's legacy-named store resumes
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -40,6 +47,8 @@ directory tree is the flake's output tree.
 | `orchestrate-populated-store` | pure check | Orchestrate |
 | `orchestrate-old-meta-name` | pure check | Orchestrate |
 | `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.36.1 (`orchestrate-previous`), then Orchestrate |
+| `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.35.0 (`orchestrate-live`) |
+| `orchestrate-live-orchestrate` | pure check | Orchestrate 0.35.0 (`orchestrate-live`), then Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)
@@ -82,6 +91,28 @@ legacy name, and at the default name fails on stderr with
 (exit 1) while the ordinary client is unaffected. A meta `Configure` back to
 `orchestrate-meta.sock` and a restart restore the default, and the legacy name
 is then refused the same way.
+
+### `orchestrate-rollback` (pure)
+
+The morning rollback path. The Nexus under test opens a fresh store, takes a
+meta `Configure` and one Lock, and is stopped with TERM; the live release then
+starts on the same directories through the component's `attempt`, which records
+whether a Nexus became ready or exited (and its stderr) instead of failing on an
+exit, so a refusal could be stated exactly. It is witnessed to resume: ready,
+empty stderr, `Observed.Locks.[ { 1 … } ]`, `LockRejected.PathOverlap` on the
+held path, the next Lock numbered 2, ordinary `Configure` →
+`ConfigurationRefused.{ MetaConfigureOccurred }`, and meta `Configure` on
+`orchestrate-meta.sock` → `Configured.{ { … } True }`. The name is the one the
+rollback brief gave, not the drive-order name.
+
+### `orchestrate-live-orchestrate` (pure)
+
+The live host's store forward: the live release opens a fresh store, is
+configured over its meta client to `meta-orchestrate.sock` and takes one Lock;
+the Nexus under test then resumes it, holds the Lock, numbers the next one 2,
+and answers a meta `Configure` through `meta-orchestrate.sock` with
+`Configured.{ { … } True }`. Unlike `orchestrate-old-meta-name`, the store here
+is written by 0.35.0 and carries a Lock.
 
 ### `orchestrate-claude` (semi-sandbox, gated)
 

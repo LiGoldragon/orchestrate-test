@@ -14,6 +14,12 @@
     # its store: 0.36.1.
     orchestrate-previous.url = "github:LiGoldragon/orchestrate/bc5cd36e81df395ed1f84e2e3e98d5a6ee90bf8c";
     orchestrate-previous.inputs.nixpkgs.follows = "nixpkgs";
+
+    # The release the live Nexus runs, for the rollback scenarios: 0.35.0,
+    # 9070cbb8, whose package built against this flake's nixpkgs is the very
+    # store path the live orchestrate-nexus service executes.
+    orchestrate-live.url = "github:LiGoldragon/orchestrate/9070cbb8717813b127e448dd5a43a2095daf7d1b";
+    orchestrate-live.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs: inputs.blueprint { inherit inputs; };

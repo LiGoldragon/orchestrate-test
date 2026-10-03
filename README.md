@@ -7,6 +7,10 @@ Nexus changes rarely, so a new or edited scenario never invalidates the Rust
 build, and Orchestrate moves forward here only when this repository updates its
 input.
 
+A second input, `orchestrate-previous`, pins the release before the one under
+test (0.36.1, `bc5cd36e`) for the scenario that resumes its store; move it to
+the outgoing release whenever `orchestrate` moves past a store or wire change.
+
 Test unpushed Orchestrate code with
 `--override-input orchestrate path:/git/github.com/LiGoldragon/orchestrate`.
 Once it lands, `nix flake update orchestrate` and commit the lock.
@@ -23,6 +27,7 @@ directory tree is the flake's output tree.
     checks/orchestrate.nix             pure scenario (a check)
     checks/orchestrate-populated-store.nix   pure: restart on a populated store
     checks/orchestrate-old-meta-name.nix     pure: a store saving a non-default meta socket name
+    checks/orchestrate-previous-orchestrate.nix   pure: the previous release's store resumes
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -34,6 +39,7 @@ directory tree is the flake's output tree.
 | `orchestrate` | pure check | Orchestrate (Nexus, `orchestrate`, `orchestrate-meta`) |
 | `orchestrate-populated-store` | pure check | Orchestrate |
 | `orchestrate-old-meta-name` | pure check | Orchestrate |
+| `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.36.1 (`orchestrate-previous`), then Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)

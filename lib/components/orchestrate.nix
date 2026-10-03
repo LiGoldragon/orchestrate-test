@@ -1,15 +1,17 @@
 # Orchestrate: the Orchestrate Nexus and its `orchestrate` / `orchestrate-meta`
-# clients, taken from the pinned `orchestrate` input. The Nexus takes no
+# clients, taken from a pinned orchestrate input: `orchestrate` for the
+# generation under test, `orchestrate-previous` for the release before it. The
+# Nexus takes no
 # arguments; it reads XDG_RUNTIME_DIR for its sockets and XDG_STATE_HOME for
 # its store, so a scenario points both at its own root and gets a fresh store
 # and its own sockets. The direct clients read ORCHESTRATE_SOCKET and
 # ORCHESTRATE_META_SOCKET and have no default of their own.
-{ inputs }:
+{ name, input }:
 {
-  name = "orchestrate";
+  inherit name;
 
   forSystem = system: rec {
-    package = inputs.orchestrate.packages.${system}.default;
+    package = input.packages.${system}.default;
 
     nexus = "${package}/bin/orchestrate-nexus";
     client = "${package}/bin/orchestrate";

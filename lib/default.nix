@@ -4,7 +4,14 @@
   # `flake.lib.components.<name>`, takes what it needs, and adds only its own
   # drive and assertions.
   components = {
-    orchestrate = import ./components/orchestrate.nix { inherit inputs; };
+    orchestrate = import ./components/orchestrate.nix {
+      name = "orchestrate";
+      input = inputs.orchestrate;
+    };
+    orchestrate-previous = import ./components/orchestrate.nix {
+      name = "orchestrate-previous";
+      input = inputs.orchestrate-previous;
+    };
   };
 
   # The shared frame of a pure scenario: `flake.lib.scenario { pkgs, name }

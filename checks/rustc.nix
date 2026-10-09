@@ -30,9 +30,9 @@ flake.lib.scenario
       ${rust.rustc} --edition 2024 -o "$binary" \
         "${fixtures}/$fixture.rs" 2>"$root/$fixture.stderr"
       code=$?
-      set -e
       codes="$(grep -o '^error\[E[0-9]*\]' "$root/$fixture.stderr" \
         | sed 's/^error\[\(.*\)\]$/\1/' | sort -u | tr '\n' ' ')"
+      set -e
       codes="''${codes% }"
       if [ "$code" = 0 ]; then
         if [ "$want" = run ]; then

@@ -1,0 +1,12 @@
+[package]
+name = "datom-codec-types"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+exclude = ["datom-codec"]
+
+[dependencies]
+datom-codec = { path = "datom-codec" }
+protos = { git = "https://github.com/LiGoldragon/protos", rev = "15b41da8f2579e73ead59bc0c2b97529b8ac32d3" }

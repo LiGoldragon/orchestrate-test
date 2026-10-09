@@ -16,6 +16,10 @@
       name = "orchestrate-live";
       input = inputs.orchestrate-live;
     };
+    rust = import ./components/rust.nix { input = inputs.datom-codec; };
+    datom-codec = import ./components/datom-codec.nix {
+      input = inputs.datom-codec;
+    };
   };
 
   # The shared frame of a pure scenario: `flake.lib.scenario { pkgs, name }

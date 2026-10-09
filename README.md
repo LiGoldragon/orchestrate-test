@@ -38,6 +38,12 @@ directory tree is the flake's output tree.
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
+    lib/components/rust.nix            rustc and crane from datom-codec's rust-build
+    lib/components/datom-codec.nix     the datom-codec input's source
+    checks/rustc.nix                   pure: type, newtype and alias compile outcomes
+    checks/datom-codec.nix             pure: datom text of a String alias and newtype
+    fixtures/rustc/                    one Rust file per compile outcome
+    fixtures/datom-codec/              the crate printing through the derive
 
 ## Scenarios
 
@@ -49,6 +55,8 @@ directory tree is the flake's output tree.
 | `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.36.1 (`orchestrate-previous`), then Orchestrate |
 | `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.35.0 (`orchestrate-live`) |
 | `orchestrate-live-orchestrate` | pure check | Orchestrate 0.35.0 (`orchestrate-live`), then Orchestrate |
+| `rustc` | pure check | the Rust compiler of datom-codec's rust-build |
+| `datom-codec` | pure check | datom-codec 0.32.2 and its derive |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)

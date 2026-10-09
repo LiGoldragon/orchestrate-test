@@ -20,6 +20,12 @@
     # store path the live orchestrate-nexus service executes.
     orchestrate-live.url = "github:LiGoldragon/orchestrate/9070cbb8717813b127e448dd5a43a2095daf7d1b";
     orchestrate-live.inputs.nixpkgs.follows = "nixpkgs";
+
+    # The datom codec Orchestrate's contracts derive through, for the
+    # scenario that prints a String alias and a String newtype: 0.32.2. Its
+    # pinned rust-build also supplies the compiler every Rust scenario runs.
+    datom-codec.url = "github:LiGoldragon/datom-codec/4dff16b4f7412febc3b71aac8b49680cd20988cb";
+    datom-codec.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs: inputs.blueprint { inherit inputs; };

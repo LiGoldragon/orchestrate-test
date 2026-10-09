@@ -27,7 +27,8 @@ flake.lib.scenario
       fixture="$1" want="$2"
       binary="$root/$fixture"
       set +e
-      ${rust.rustc} --edition 2024 -o "$binary" \
+      ${rust.rustc} --edition 2024 -C linker=${pkgs.stdenv.cc}/bin/cc \
+        -o "$binary" \
         "${fixtures}/$fixture.rs" 2>"$root/$fixture.stderr"
       code=$?
       codes="$(grep -o '^error\[E[0-9]*\]' "$root/$fixture.stderr" \

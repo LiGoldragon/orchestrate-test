@@ -1,12 +1,12 @@
 # A pure scenario: the morning rollback path. The release under test
-# (orchestrate, 0.37.0) opens a fresh store, takes a meta Configure and one
+# (orchestrate, 0.39.0) opens a fresh store, takes a meta Configure and one
 # Lock, and is stopped with TERM; the release the live Nexus runs
-# (orchestrate-live, 0.35.0) then starts on the same runtime and state
-# directories. The scenario states what 0.35.0 answers that store with: it
+# (orchestrate-live, 0.38.0) then starts on the same runtime and state
+# directories. The scenario states what 0.38.0 answers that store with: it
 # resumes it, holding the Lock, refusing its path, numbering on from it,
 # keeping ordinary Configure shut, and serving the meta socket the store
 # names. Witnessed in flow f1c841
-# (reports/orchestrate-rollback-witness.md); were 0.35.0 to refuse the store,
+# (reports/orchestrate-rollback-witness.md); were 0.38.0 to refuse the store,
 # its exit and stderr would be the expectation here instead.
 {
   pkgs,

@@ -7,18 +7,18 @@
     blueprint.url = "github:numtide/blueprint";
     blueprint.inputs.nixpkgs.follows = "nixpkgs";
 
-    orchestrate.url = "github:LiGoldragon/orchestrate/c7c44cb39934b0727d724a6aa03a36a2a94cacf9";
+    orchestrate.url = "github:LiGoldragon/orchestrate/e78534fce1e8ae52dec4e5c45ef59596a9f6c5f0";
     orchestrate.inputs.nixpkgs.follows = "nixpkgs";
 
     # The release before the one under test, for the scenario that resumes
-    # its store: 0.36.1.
-    orchestrate-previous.url = "github:LiGoldragon/orchestrate/bc5cd36e81df395ed1f84e2e3e98d5a6ee90bf8c";
+    # its store: 0.38.0.
+    orchestrate-previous.url = "github:LiGoldragon/orchestrate/0f9961460f84b752fa9605ebf0e2b6e1c685aa91";
     orchestrate-previous.inputs.nixpkgs.follows = "nixpkgs";
 
-    # The release the live Nexus runs, for the rollback scenarios: 0.35.0,
-    # 9070cbb8, whose package built against this flake's nixpkgs is the very
-    # store path the live orchestrate-nexus service executes.
-    orchestrate-live.url = "github:LiGoldragon/orchestrate/9070cbb8717813b127e448dd5a43a2095daf7d1b";
+    # The release the live Nexus runs, for the rollback scenarios: 0.38.0,
+    # 0f996146, the source of the live orchestrate-nexus service's package
+    # (orchestrate-0.38.0).
+    orchestrate-live.url = "github:LiGoldragon/orchestrate/0f9961460f84b752fa9605ebf0e2b6e1c685aa91";
     orchestrate-live.inputs.nixpkgs.follows = "nixpkgs";
   };
 

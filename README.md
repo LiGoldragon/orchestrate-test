@@ -8,12 +8,12 @@ build, and Orchestrate moves forward here only when this repository updates its
 input.
 
 A second input, `orchestrate-previous`, pins the release before the one under
-test (0.36.1, `bc5cd36e`) for the scenario that resumes its store; move it to
+test (0.38.0, `0f996146`) for the scenario that resumes its store; move it to
 the outgoing release whenever `orchestrate` moves past a store or wire change.
 
 A third input, `orchestrate-live`, pins the release the live Nexus runs
-(0.35.0, `9070cbb8`; built against this flake's `nixpkgs` its package is the
-very store path the live `orchestrate-nexus` service executes) for the rollback
+(0.38.0, `0f996146`, the source of the live `orchestrate-nexus` service's
+package `orchestrate-0.38.0`) for the rollback
 scenarios; move it when the live Nexus is redeployed.
 
 Test unpushed Orchestrate code with
@@ -46,9 +46,9 @@ directory tree is the flake's output tree.
 | `orchestrate` | pure check | Orchestrate (Nexus, `orchestrate`, `orchestrate-meta`) |
 | `orchestrate-populated-store` | pure check | Orchestrate |
 | `orchestrate-old-meta-name` | pure check | Orchestrate |
-| `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.36.1 (`orchestrate-previous`), then Orchestrate |
-| `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.35.0 (`orchestrate-live`) |
-| `orchestrate-live-orchestrate` | pure check | Orchestrate 0.35.0 (`orchestrate-live`), then Orchestrate |
+| `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-previous`), then Orchestrate |
+| `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.38.0 (`orchestrate-live`) |
+| `orchestrate-live-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-live`), then Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)
@@ -112,7 +112,7 @@ configured over its meta client to `meta-orchestrate.sock` and takes one Lock;
 the Nexus under test then resumes it, holds the Lock, numbers the next one 2,
 and answers a meta `Configure` through `meta-orchestrate.sock` with
 `Configured.{ { … } True }`. Unlike `orchestrate-old-meta-name`, the store here
-is written by 0.35.0 and carries a Lock.
+is written by 0.38.0 and carries a Lock.
 
 ### `orchestrate-claude` (semi-sandbox, gated)
 

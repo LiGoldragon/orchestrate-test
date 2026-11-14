@@ -1,8 +1,9 @@
 # A pure scenario: a store the previous release served resumes under the
-# release under test. The previous Nexus (orchestrate-previous) opens a fresh
-# store, takes a meta Configure and one Lock, and answers the client under
-# test as well as its own, since the contract digests did not change. It is
-# stopped with TERM, and the Nexus under test starts on the same runtime and
+# release under test. The previous Nexus (orchestrate-previous, 0.38.0) opens
+# a fresh store, takes a meta Configure and one Lock. The ordinary contract
+# digest changed in 0.39.0, so the ordinary client under test is refused at
+# the greeting with the previous contract's digest; the meta contract did not
+# change, so the meta client under test is answered. It is stopped with TERM, and the Nexus under test starts on the same runtime and
 # state directories: it must hold the Lock, refuse its path, go on numbering
 # from it, and keep ordinary Configure shut by the meta Configure the
 # previous Nexus took.
@@ -30,8 +31,10 @@ flake.lib.scenario
       ${previous.metaClient} "Configure.{ «$ORCHESTRATE_SOCKET» «$ORCHESTRATE_META_SOCKET» }"
     expect previous-lock 0 "Locked.$held" \
       ${previous.client} "Lock.{ Held f1c841 [ $heldPath ] «previous generation» }"
-    expect client-under-test-on-previous 0 "Observed.Locks.[ $held ]" \
+    expectFailure client-under-test-on-previous 1 "GreetingRefused.ContractMismatch.8912638139974146909" \
       ${orchestrate.client} 'Observe.Locks'
+    expect meta-client-under-test-on-previous 0 "Configured.{ { $ORCHESTRATE_SOCKET $ORCHESTRATE_META_SOCKET } True }" \
+      ${orchestrate.metaClient} "Configure.{ «$ORCHESTRATE_SOCKET» «$ORCHESTRATE_META_SOCKET» }"
 
     ${previous.stop}
     echo "previous Nexus stopped with TERM; starting the Nexus under test on its store"

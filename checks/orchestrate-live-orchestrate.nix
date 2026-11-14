@@ -1,8 +1,8 @@
 # A pure scenario: the live host's store, forward. The release the live Nexus
-# runs (orchestrate-live, 0.35.0) opens a fresh store, is configured over its
+# runs (orchestrate-live, 0.38.0) opens a fresh store, is configured over its
 # meta client to the legacy meta socket name `meta-orchestrate.sock` (the name
 # the live store saves) and takes one Lock; it is stopped with TERM and the
-# release under test (orchestrate, 0.37.0) starts on the same directories. It
+# release under test (orchestrate, 0.39.0) starts on the same directories. It
 # must hold the Lock and answer a meta Configure through the legacy name.
 {
   pkgs,

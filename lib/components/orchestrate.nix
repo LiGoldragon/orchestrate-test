@@ -16,6 +16,7 @@
     nexus = "${package}/bin/orchestrate-nexus";
     client = "${package}/bin/orchestrate";
     metaClient = "${package}/bin/orchestrate-meta";
+    relocate = "${package}/bin/orchestrate-relocate";
 
     # Relative to XDG_RUNTIME_DIR and XDG_STATE_HOME, as orchestrate-nexus
     # derives them for a fresh store.

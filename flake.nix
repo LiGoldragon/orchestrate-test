@@ -7,7 +7,7 @@
     blueprint.url = "github:numtide/blueprint";
     blueprint.inputs.nixpkgs.follows = "nixpkgs";
 
-    orchestrate.url = "github:LiGoldragon/orchestrate/32e0e2cd6f9678bb40de7dc124814bf579e61dcb";
+    orchestrate.url = "github:LiGoldragon/orchestrate/9e65b559e3260ed3f91e059bce2c0ab5dc052a74";
     orchestrate.inputs.nixpkgs.follows = "nixpkgs";
 
     # The release before the one under test, for the scenario that resumes

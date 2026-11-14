@@ -40,6 +40,7 @@ directory tree is the flake's output tree.
     checks/orchestrate-rollback.nix               pure: the live release resumes the store under test
     checks/orchestrate-live-orchestrate.nix       pure: the live release's legacy-named store resumes
     checks/orchestrate-sema-orchestrate.nix       pure: a store sema-engine wrote is upgraded on open
+    checks/orchestrate-sema-carried.nix           pure: a sema store upgraded and then refused as carried says it was upgraded
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -55,6 +56,7 @@ directory tree is the flake's output tree.
 | `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.38.0 (`orchestrate-live`) |
 | `orchestrate-live-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-live`), then Orchestrate |
 | `orchestrate-sema-orchestrate` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then Orchestrate |
+| `orchestrate-sema-carried` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then Orchestrate and `orchestrate-relocate` |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)

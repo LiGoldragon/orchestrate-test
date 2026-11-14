@@ -32,7 +32,7 @@ directory tree is the flake's output tree.
     flake.nix                          inputs and `inputs.blueprint { inherit inputs; }`
     lib/default.nix                    flake.lib: components, scenario, cheapestModel
     lib/scenario.nix                   the frame of a pure scenario: root, expect, exit trap
-    lib/components/orchestrate.nix     the Nexus and both clients: paths, start, stop
+    lib/components/orchestrate.nix     the Nexus, both clients and the two store tools: paths, start, stop
     checks/orchestrate.nix             pure scenario (a check)
     checks/orchestrate-populated-store.nix   pure: restart on a populated store
     checks/orchestrate-old-meta-name.nix     pure: a store saving a non-default meta socket name
@@ -41,6 +41,7 @@ directory tree is the flake's output tree.
     checks/orchestrate-live-orchestrate.nix       pure: the live release's legacy-named store resumes
     checks/orchestrate-sema-orchestrate.nix       pure: a store sema-engine wrote is upgraded on open
     checks/orchestrate-sema-carried.nix           pure: a sema store upgraded and then refused as carried says it was upgraded
+    checks/orchestrate-sema-tools.nix             pure: the preflight and orchestrate-relocate upgrade a sema store and say so
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -57,6 +58,7 @@ directory tree is the flake's output tree.
 | `orchestrate-live-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-live`), then Orchestrate |
 | `orchestrate-sema-orchestrate` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then Orchestrate |
 | `orchestrate-sema-carried` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then Orchestrate and `orchestrate-relocate` |
+| `orchestrate-sema-tools` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then `orchestrate-upgrade-preflight`, `orchestrate-relocate` and Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)
@@ -71,7 +73,12 @@ clients and compares each whole reply and exit code:
    `Locked.{ 1 OrchestrateTestProbe 3ec648 [ <path> ] «two words» }`
 3. `Release.1` → `Released.{ 1 … «two words» }`
 4. `Observe.Locks` → `Observed.Locks.[]`
-5. meta `Configure.{ «<ordinary>» «<meta>» }` →
+5. a Lock for each fault of its own paths a client can write, each rejected by
+   name: `[]` → `LockRejected.NoPath`, `[ relative/path ]` →
+   `LockRejected.RelativePath.relative/path`, a path through `..` →
+   `LockRejected.ParentComponent.<path>`, and one path given twice →
+   `LockRejected.DuplicatePath.<path>`; then `Observed.Locks.[]`
+6. meta `Configure.{ «<ordinary>» «<meta>» }` →
    `Configured.{ { <ordinary> <meta> } True }`
 
 and then stops the Nexus and requires it to exit on TERM. No network, no

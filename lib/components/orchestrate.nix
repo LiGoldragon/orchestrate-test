@@ -21,7 +21,7 @@
     # derives them for a fresh store.
     ordinarySocket = "orchestrate-nexus/orchestrate.sock";
     metaSocket = "orchestrate-nexus/orchestrate-meta.sock";
-    store = "orchestrate-nexus/orchestrate-nexus.sema";
+    store = "orchestrate-nexus/orchestrate-nexus.memory";
 
     # Starts the Nexus against the caller's exported XDG_RUNTIME_DIR and
     # XDG_STATE_HOME and records its pid in `orchestrateNexusPid`. It waits

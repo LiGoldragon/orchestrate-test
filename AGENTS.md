@@ -1,36 +1,28 @@
-# AGENTS.md
+# Orchestrate test repository
 
-Read the `compensation-nix` skill before writing anything here, and
-`compensation-nix-rationale` before discussing this repository's shape.
+Use the knowledge:nix-rust-builds skill for shared build-base discipline.
 
-## What this repository is
+This repository holds scenarios and their fixtures. Component source remains
+in its own repository. Tests consume the component's packages; they do not
+reconstruct or compile its Rust workspace.
 
-The test twin of `orchestrate`. It contains **no component source**. Every tested
-repository is a pinned flake input whose `nixpkgs` follows this flake's:
+Every input URL names its bare repository. flake.lock holds each revision.
+Preserve the previous, live, and sema migration fixtures at their recorded
+revisions. They are historical fixtures, not candidates to upgrade.
 
-    inputs.orchestrate.url = "github:LiGoldragon/orchestrate/<rev>";
-    inputs.orchestrate.inputs.nixpkgs.follows = "nixpkgs";
+Take pkgs from base.lib.contexts and override none of the component's base
+inputs. One file holds one scenario, component, or builder. A scenario takes
+its components from flake.lib.components and supplies only drive and assertions.
+New component behavior belongs in lib/components/<name>.nix.
 
-Tests belong here and not in the tested repository's flake, because an edited
-test in that flake changes its source and rebuilds its Rust on a push that
-touched no Rust.
+A pure scenario is a check without network or credentials. A semi-sandbox
+remains a packages/<scenario>.nix runner with its own temporary state root and
+exit trap, run only with the living's requested live credentials.
 
-## Rules
+Name packages through pkgs; use no `with pkgs` expression. Format edited Nix
+files with nixfmt before committing. Commit only files this flow edited.
 
-- One file holds one scenario, component, or builder.
-- Name a scenario by its components, hyphen-joined, in drive order.
-- A scenario takes its components from `flake.lib.components` and adds only its
-  own drive and assertions. New component behaviour goes in
-  `lib/components/<name>.nix`.
-- Name every package as `pkgs.<name>`; never `with pkgs;`.
-- A pure scenario is a check: no network, no credentials.
-- A semi-sandbox is a `packages/<scenario>.nix` runner with a `mktemp -d` state
-  root and an exit trap. Never a check, never `__impure`, never `__noChroot`.
-- Run `nix fmt` before every commit. `pkgs.nixfmt` takes files, not a
-  directory, so format the tree with
-  `find . -name '*.nix' -exec nix fmt {} +` (or pass the paths you touched).
-- Evaluate before building:
-  `nix flake check --no-build --option allow-import-from-derivation false`,
-  then `nix flake check`.
-- After each push, run `nix flake check github:LiGoldragon/orchestrate-test`, and
-  any semi-sandbox changed as `nix run github:LiGoldragon/orchestrate-test#<scenario>`.
+Evaluate and build checks on the configured remote builder, using the exact
+committed revision and the knowledge:nix-rust-builds remote gate. checks.default
+is every pure scenario and lint check. A test edit changes only its scenario
+check; component packages and historical fixture inputs remain unchanged.

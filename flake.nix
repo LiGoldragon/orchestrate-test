@@ -15,8 +15,8 @@
       perContext =
         context:
         let
-          pkgs = context.pkgs;
-          lib = pkgs.lib;
+          inherit (context) pkgs;
+          inherit (pkgs) lib;
           importDirectory =
             directory:
             lib.mapAttrs'

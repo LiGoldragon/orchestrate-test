@@ -7,7 +7,7 @@
     blueprint.url = "github:numtide/blueprint";
     blueprint.inputs.nixpkgs.follows = "nixpkgs";
 
-    orchestrate.url = "github:LiGoldragon/orchestrate/e78534fce1e8ae52dec4e5c45ef59596a9f6c5f0";
+    orchestrate.url = "github:LiGoldragon/orchestrate/a6c84bcaa097d4b6e9e0bb74900dc5e69a189b99";
     orchestrate.inputs.nixpkgs.follows = "nixpkgs";
 
     # The release before the one under test, for the scenario that resumes
@@ -20,6 +20,12 @@
     # (orchestrate-0.38.0).
     orchestrate-live.url = "github:LiGoldragon/orchestrate/0f9961460f84b752fa9605ebf0e2b6e1c685aa91";
     orchestrate-live.inputs.nixpkgs.follows = "nixpkgs";
+
+    # The last release whose store sema-engine wrote, for the scenario that
+    # upgrades it: 0.37.0, c7c44cb3, the release zeus and ouranos ran before
+    # 0.38.0 (orchestrate-0.37.0); it keeps its store at orchestrate-nexus.sema.
+    orchestrate-sema.url = "github:LiGoldragon/orchestrate/c7c44cb39934b0727d724a6aa03a36a2a94cacf9";
+    orchestrate-sema.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs = inputs: inputs.blueprint { inherit inputs; };

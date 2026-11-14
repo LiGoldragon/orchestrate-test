@@ -16,6 +16,10 @@ A third input, `orchestrate-live`, pins the release the live Nexus runs
 package `orchestrate-0.38.0`) for the rollback
 scenarios; move it when the live Nexus is redeployed.
 
+A fourth input, `orchestrate-sema`, pins 0.37.0 (`c7c44cb3`), the last release
+whose store sema-engine wrote and the release zeus and ouranos ran before
+0.38.0, for the scenario that upgrades a sema store on open.
+
 Test unpushed Orchestrate code with
 `--override-input orchestrate path:/git/github.com/LiGoldragon/orchestrate`.
 Once it lands, `nix flake update orchestrate` and commit the lock.
@@ -35,6 +39,7 @@ directory tree is the flake's output tree.
     checks/orchestrate-previous-orchestrate.nix   pure: the previous release's store resumes
     checks/orchestrate-rollback.nix               pure: the live release resumes the store under test
     checks/orchestrate-live-orchestrate.nix       pure: the live release's legacy-named store resumes
+    checks/orchestrate-sema-orchestrate.nix       pure: a store sema-engine wrote is upgraded on open
     packages/orchestrate-claude.nix    semi-sandbox runner (gated)
     checks/lint.nix                    nixfmt --check, deadnix, statix
     formatter.nix                      pkgs.nixfmt
@@ -49,6 +54,7 @@ directory tree is the flake's output tree.
 | `orchestrate-previous-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-previous`), then Orchestrate |
 | `orchestrate-rollback` | pure check | Orchestrate, then Orchestrate 0.38.0 (`orchestrate-live`) |
 | `orchestrate-live-orchestrate` | pure check | Orchestrate 0.38.0 (`orchestrate-live`), then Orchestrate |
+| `orchestrate-sema-orchestrate` | pure check | Orchestrate 0.37.0 (`orchestrate-sema`), then Orchestrate |
 | `orchestrate-claude` | semi-sandbox, gated | Orchestrate, Claude Code on the cheapest model |
 
 ### `orchestrate` (pure)

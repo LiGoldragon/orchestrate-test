@@ -16,6 +16,10 @@
       name = "orchestrate-live";
       input = inputs.orchestrate-live;
     };
+    orchestrate-sema = import ./components/orchestrate.nix {
+      name = "orchestrate-sema";
+      input = inputs.orchestrate-sema;
+    };
   };
 
   # The shared frame of a pure scenario: `flake.lib.scenario { pkgs, name }
